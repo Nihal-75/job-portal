@@ -6,10 +6,25 @@ const connectDB = require('./config/db');
 // Load env vars
 dotenv.config();
 
-// Connect to database
-connectDB();
+// Connect to database (now handled per-request for Vercel Serverless)
+// connectDB(); // Removed from top-level to avoid cold-start crashes
 
 const app = express();
+
+// Vercel Serverless MongoDB Connection Middleware
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection error in middleware:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Database connection failed. Are you sure the MONGO_URI Environment Variable is set in Vercel?',
+      error: error.message
+    });
+  }
+});
 
 // Middleware
 app.use(cors());
