@@ -6,25 +6,10 @@ const connectDB = require('./config/db');
 // Load env vars
 dotenv.config();
 
-// Connect to database (now handled per-request for Vercel Serverless)
-// connectDB(); // Removed from top-level to avoid cold-start crashes
+// Connect to database
+connectDB();
 
 const app = express();
-
-// Vercel Serverless MongoDB Connection Middleware
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error('Database connection error in middleware:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Database connection failed. Are you sure the MONGO_URI Environment Variable is set in Vercel?',
-      error: error.message
-    });
-  }
-});
 
 // Middleware
 app.use(cors());
@@ -48,7 +33,8 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+// Only listen if run directly (e.g., node server.js), not if imported by Vercel
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
