@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
+import { useContext } from 'react';
 
 const Home = () => {
+  const { api } = useContext(AuthContext);
   const [jobs, setJobs] = useState([]);
   const [searchCategory, setSearchCategory] = useState('');
   const [searchLocation, setSearchLocation] = useState('');
@@ -20,12 +23,12 @@ const Home = () => {
       if (searchCategory) queryParams.append('category', searchCategory);
       if (searchLocation) queryParams.append('location', searchLocation);
 
-      let query = `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/jobs`;
+      let query = '/jobs';
       if (queryParams.toString()) {
         query += `?${queryParams.toString()}`;
       }
 
-      const res = await axios.get(query);
+      const res = await api.get(query);
       setJobs(res.data);
     } catch (err) {
       console.error('Error fetching jobs', err);
@@ -37,7 +40,7 @@ const Home = () => {
     const fetchSuggestions = async () => {
       if (searchCategory.trim().length > 1) {
         try {
-          const res = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/jobs/suggestions?q=${searchCategory}`);
+          const res = await api.get(`/jobs/suggestions?q=${searchCategory}`);
           setSuggestions(res.data);
           setShowSuggestions(true);
         } catch (err) {

@@ -28,10 +28,10 @@ router.route('/suggestions')
 
 router.route('/')
   .get(getJobs)
-  .post(protect, authorize('company'), createJob);
+  .post(protect, authorize('company', 'admin'), createJob);
 
 router.route('/:id')
-  .put(protect, authorize('company'), updateJob)
-  .delete(protect, authorize('company'), deleteJob);
+  .put(protect, authorize('company', 'admin'), updateJob)
+  .delete(protect, authorize('company', 'admin'), deleteJob);
 
 module.exports = router;

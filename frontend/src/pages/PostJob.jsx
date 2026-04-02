@@ -12,7 +12,7 @@ const PostJob = () => {
   const [serverError, setServerError] = useState('');
 
   // Protect route
-  if (!user || user.role !== 'company') {
+  if (!user || (user.role !== 'company' && user.role !== 'admin')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-900">
         <div className="text-center bg-white dark:bg-dark-800 p-10 rounded-3xl shadow-xl w-full max-w-md border border-gray-100 dark:border-dark-700">

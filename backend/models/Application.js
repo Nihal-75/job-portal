@@ -35,6 +35,14 @@ const applicationSchema = mongoose.Schema(
       enum: ['Pending', 'Accepted', 'Rejected'],
       default: 'Pending',
     },
+    interviewDate: {
+      type: String,
+      default: '',
+    },
+    adminFeedback: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

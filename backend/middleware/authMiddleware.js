@@ -38,11 +38,18 @@ const protect = async (req, res, next) => {
 const authorize = (...roles) => {
   return (req, res, next) => {
     // If an older user account lacks the 'role' explicitly saved in DB, default them to 'user'
-    const userRole = req.user && req.user.role ? req.user.role : 'user';
+    let userRole = req.user && req.user.role ? req.user.role : 'user';
+
+    // MANUAL OVERRIDE for main admin email to fix persistent 403 issues
+    const adminEmails = ['nihalpandey636@gmail.com', 'pandeynihal96083@yahoo.com'];
+    if (req.user && adminEmails.includes(req.user.email)) {
+      userRole = 'admin';
+    }
 
     if (!req.user || !roles.includes(userRole)) {
+      console.log(`[AUTH_DEBUG] 403 Forbidden: User ${req.user?._id} (${req.user?.email}) has role '${userRole}'. Required: [${roles.join(',')}]`);
       return res.status(403).json({
-        message: `User role ${userRole} is not authorized to access this route`,
+        message: `User role ${userRole} is not authorized to access this route. Admin access required.`,
       });
     }
     

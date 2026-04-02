@@ -11,6 +11,7 @@ import DashboardRoot from './components/DashboardRoot';
 import JobDetails from './pages/JobDetails';
 import PostJob from './pages/PostJob';
 import ApplicantsList from './pages/ApplicantsList';
+import AdminDashboard from './pages/AdminDashboard';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -28,6 +29,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<DashboardRoot />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/job/:id" element={<JobDetails />} />
               <Route path="/post-job" element={<PostJob />} />
               <Route path="/job/:jobId/applicants" element={<ApplicantsList />} />

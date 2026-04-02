@@ -76,9 +76,9 @@ const Register = () => {
         };
       }
 
-      const success = await register(payload);
-      if (!success) {
-        setErrorMsg('Registration failed. Email might already be in use.');
+      const result = await register(payload);
+      if (!result.success) {
+        setErrorMsg(result.message || 'Registration failed. Please try again.');
       }
       setSubmitting(false);
     },

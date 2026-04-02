@@ -78,12 +78,29 @@ const Navbar = () => {
 
             {user ? (
               <div className="flex items-center gap-4">
-                <Link to="/dashboard" className="px-4 py-2 font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 dark:text-brand-400 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 rounded-lg transition-colors">
-                  Dashboard
-                </Link>
+                {user.role === 'admin' ? (
+                  <Link 
+                    to="/admin" 
+                    className="px-5 py-2.5 font-extrabold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-xl shadow-indigo-500/30 flex items-center gap-2 group transform hover:-translate-y-1 active:scale-95"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-200"></span>
+                    </span>
+                    Admin Panel
+                  </Link>
+                ) : (
+                  <Link 
+                    to="/dashboard" 
+                    className="px-4 py-2 font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 dark:text-brand-400 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 rounded-xl transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                
                 <button 
                   onClick={logout}
-                  className="px-4 py-2 font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  className="px-4 py-2 font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
                 >
                   Logout
                 </button>
@@ -125,7 +142,9 @@ const Navbar = () => {
             
             {user ? (
               <>
-                <Link to="/dashboard" className={mobileLinkClass}>Dashboard</Link>
+                <Link to={user.role === 'admin' ? "/admin" : "/dashboard"} className={mobileLinkClass}>
+                  {user.role === 'admin' ? "Admin Panel" : "Dashboard"}
+                </Link>
                 <button 
                   onClick={() => { logout(); setMobileMenuOpen(false); }}
                   className="w-full text-left py-3 text-lg font-medium text-red-600"

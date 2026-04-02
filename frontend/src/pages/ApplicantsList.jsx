@@ -104,7 +104,7 @@ const ApplicantsList = () => {
                     </td>
                     <td className="p-5 flex flex-col gap-2">
                       <a 
-                        href={app.resumeUrl?.startsWith('http') ? app.resumeUrl : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000'}/${app.resumeUrl}`} 
+                        href={app.resumeUrl?.startsWith('http') ? app.resumeUrl : `${process.env.REACT_APP_BASE_URL}/${app.resumeUrl}`} 
                         target="_blank" 
                         rel="noreferrer"
                         className="inline-flex items-center justify-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/40 px-3 py-2 rounded-lg font-bold text-sm transition"
@@ -113,7 +113,7 @@ const ApplicantsList = () => {
                       </a>
                       {app.experienceCertificateUrl && (
                         <a 
-                          href={app.experienceCertificateUrl.startsWith('http') ? app.experienceCertificateUrl : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000'}/${app.experienceCertificateUrl}`} 
+                          href={app.experienceCertificateUrl.startsWith('http') ? app.experienceCertificateUrl : `${process.env.REACT_APP_BASE_URL}/${app.experienceCertificateUrl}`} 
                           target="_blank" 
                           rel="noreferrer"
                           className="inline-flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-800/40 px-3 py-2 rounded-lg font-bold text-sm transition"

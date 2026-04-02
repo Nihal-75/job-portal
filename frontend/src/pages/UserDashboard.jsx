@@ -119,6 +119,21 @@ const UserDashboard = () => {
                            {(app.status !== 'Accepted' && app.status !== 'Rejected') && <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-1.5 animate-pulse"></span>}
                           {app.status}
                         </span>
+                        {(app.status === 'Accepted' && app.interviewDate) && (
+                          <div className="mt-2 flex flex-col items-center">
+                            <div className="text-[10px] font-extrabold text-brand-600 dark:text-brand-400 uppercase tracking-tighter flex items-center gap-1 bg-brand-50 dark:bg-brand-900/30 px-2 py-0.5 rounded-md border border-brand-100 dark:border-brand-800/50">
+                              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <span>Interview: {app.interviewDate}</span>
+                            </div>
+                            {app.adminFeedback && (
+                               <div className="text-[9px] text-gray-500 dark:text-gray-400 italic mt-1 max-w-[140px] truncate" title={app.adminFeedback}>
+                                 "{app.adminFeedback}"
+                               </div>
+                            )}
+                          </div>
+                        )}
                       </td>
                       <td className="p-5 text-right whitespace-nowrap">
                          <div className="flex items-center justify-end gap-2">

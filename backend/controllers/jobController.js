@@ -102,14 +102,24 @@ const createJob = async (req, res) => {
     }
 
     // Find the company associated with the logged in user
-    const company = await Company.findOne({ userId: req.user.id });
-
-    if (!company) {
-      return res.status(404).json({ message: 'Company profile not found for this user' });
+    let companyId;
+    if (req.user.role === 'admin') {
+      // Find any company or create a "System" company for admin
+      const anyCompany = await Company.findOne();
+      if (!anyCompany) {
+        return res.status(404).json({ message: 'Please create at least one company profile first' });
+      }
+      companyId = anyCompany._id;
+    } else {
+      const company = await Company.findOne({ userId: req.user.id });
+      if (!company) {
+        return res.status(404).json({ message: 'Company profile not found for this user' });
+      }
+      companyId = company._id;
     }
 
     const job = await Job.create({
-      companyId: company._id,
+      companyId,
       title,
       description,
       salary,
@@ -136,16 +146,12 @@ const updateJob = async (req, res) => {
       return res.status(404).json({ message: 'Job not found' });
     }
 
-    // Find requested user's company profile
-    const company = await Company.findOne({ userId: req.user.id });
-    
-    if (!company) {
-       return res.status(404).json({ message: 'Company profile not found' });
-    }
-
-    // Make sure the logged in company user matches the job's company ID
-    if (job.companyId.toString() !== company._id.toString()) {
-      return res.status(403).json({ message: 'User not authorized to update this job' });
+    // Allow admins to bypass ownership check
+    if (req.user.role !== 'admin') {
+      const company = await Company.findOne({ userId: req.user.id });
+      if (!company || job.companyId.toString() !== company._id.toString()) {
+        return res.status(403).json({ message: 'User not authorized to update this job' });
+      }
     }
 
     const updatedJob = await Job.findByIdAndUpdate(
@@ -172,16 +178,12 @@ const deleteJob = async (req, res) => {
       return res.status(404).json({ message: 'Job not found' });
     }
 
-    // Find requested user's company profile
-    const company = await Company.findOne({ userId: req.user.id });
-    
-    if (!company) {
-       return res.status(404).json({ message: 'Company profile not found' });
-    }
-
-    // Make sure the logged in company user matches the job's company ID
-    if (job.companyId.toString() !== company._id.toString()) {
-      return res.status(403).json({ message: 'User not authorized to delete this job' });
+    // Allow admins to bypass ownership check
+    if (req.user.role !== 'admin') {
+      const company = await Company.findOne({ userId: req.user.id });
+      if (!company || job.companyId.toString() !== company._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to delete this job' });
+      }
     }
 
     await job.deleteOne();

@@ -13,9 +13,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ["https://job-portal-bna4.vercel.app","https://job-portal-livid-kappa.vercel.app"],
+  origin: true,
   methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
