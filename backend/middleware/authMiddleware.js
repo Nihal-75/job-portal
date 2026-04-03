@@ -37,25 +37,28 @@ const protect = async (req, res, next) => {
 // Role authorization middleware
 const authorize = (...roles) => {
   return (req, res, next) => {
-    // If an older user account lacks the 'role' explicitly saved in DB, default them to 'user'
+    // 1. Get the current role from the user object (default to 'user')
     let userRole = req.user && req.user.role ? req.user.role : 'user';
 
-    // MANUAL OVERRIDE for main admin email to fix persistent 403 issues
-    const adminEmails = ['nihalpandey636@gmail.com', 'pandeynihal96083@yahoo.com'];
-    if (req.user && adminEmails.includes(req.user.email)) {
+    // 2. STRICT MASTER KEY: Only admin@gmail.com can bypass or assume admin role
+    const masterAdminEmail = 'admin@gmail.com';
+    const currentUserEmail = req.user?.email?.toLowerCase().trim();
+    
+    if (currentUserEmail === masterAdminEmail) {
+      console.log(`[AUTH_SECURITY] 🛡️ SUPER ADMIN DETECTED: Granting Master Access to ${currentUserEmail}`);
       userRole = 'admin';
+      if (req.user) req.user.role = 'admin';
     }
 
+    // 3. Perform the actual authorization check
     if (!req.user || !roles.includes(userRole)) {
-      console.log(`[AUTH_DEBUG] 403 Forbidden: User ${req.user?._id} (${req.user?.email}) has role '${userRole}'. Required: [${roles.join(',')}]`);
+      console.log(`[AUTH_SECURITY] ❌ ACCESS DENIED: User ${req.user?._id} (${currentUserEmail}) role '${userRole}' is not in [${roles.join(',')}]`);
       return res.status(403).json({
-        message: `User role ${userRole} is not authorized to access this route. Admin access required.`,
+        message: `Administrative access restricted. Only the Super Admin can access this route.`,
       });
     }
     
-    // Inject the resolved role back so controllers can rely on it if needed
-    if (req.user && !req.user.role) req.user.role = userRole;
-    
+    console.log(`[AUTH_SECURITY] ✅ GRANTED: ${currentUserEmail} [${userRole}] accessing [${roles.join(',')}]`);
     next();
   };
 };

@@ -55,8 +55,8 @@ const Footer = () => {
             <h3 className="text-white font-extrabold mb-6 tracking-wider text-sm uppercase">Contact Us</h3>
             <ul className="space-y-4 font-medium text-sm">
               <li className="text-gray-300">SkillSpring Inc.</li>
-              <li><a href="mailto:contact@skillspring.com" className="text-gray-400 hover:text-brand-400 transition-colors">nihalpandey636@gmail.com</a></li>
-              <li><a href="tel:+1234567890" className="text-gray-400 hover:text-brand-400 transition-colors">+91 77177947185</a></li>
+              <li><a href="mailto:contact@skillspring.com" className="text-gray-400 hover:text-brand-400 transition-colors">sakshisingh@gmail.com</a></li>
+              <li><a href="tel:+1234567890" className="text-gray-400 hover:text-brand-400 transition-colors">+91 7526015282</a></li>
             </ul>
           </div>
         </div>

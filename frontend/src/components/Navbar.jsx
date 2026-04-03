@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
+import { ShieldCheck } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -78,16 +79,15 @@ const Navbar = () => {
 
             {user ? (
               <div className="flex items-center gap-4">
-                {user.role === 'admin' ? (
+                {/* MASTER ADMIN LOGIC */}
+                {user?.email?.toLowerCase() === 'admin@gmail.com' ? (
                   <Link 
                     to="/admin" 
-                    className="px-5 py-2.5 font-extrabold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-xl shadow-indigo-500/30 flex items-center gap-2 group transform hover:-translate-y-1 active:scale-95"
+                    className="flex items-center gap-2 px-6 py-2.5 font-black text-[10px] tracking-[0.2em] uppercase text-white bg-dark-900 hover:scale-105 rounded-2xl transition-all shadow-2xl shadow-indigo-500/40 relative group overflow-hidden border border-white/20"
                   >
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-200"></span>
-                    </span>
-                    Admin Panel
+                    <span className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 animate-pulse-slow"></span>
+                    <ShieldCheck size={16} className="text-indigo-400 group-hover:rotate-12 transition-transform" />
+                    MASTER CONTROL
                   </Link>
                 ) : (
                   <Link 

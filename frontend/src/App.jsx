@@ -12,6 +12,7 @@ import JobDetails from './pages/JobDetails';
 import PostJob from './pages/PostJob';
 import ApplicantsList from './pages/ApplicantsList';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLogin from './pages/AdminLogin';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -27,6 +28,7 @@ function App() {
               <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<DashboardRoot />} />
               <Route path="/admin" element={<AdminDashboard />} />

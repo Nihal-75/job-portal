@@ -16,11 +16,13 @@ const CompanyDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const jobsRes = await api.get('/jobs/company');
-        setJobs(jobsRes.data);
+        const [jobsRes, appsRes] = await Promise.all([
+          api.get('/jobs/company'),
+          api.get('/applications/company')
+        ]);
         
-        // In a real app we'd fetch actual real-time aggregated stats.
-        // For now, we fetch applications and build mock stats around them for the visual.
+        setJobs(jobsRes.data);
+        setApplications(appsRes.data);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -29,6 +31,19 @@ const CompanyDashboard = () => {
     };
     fetchData();
   }, [api]);
+
+  // Derive real statistics from the applications data
+  const stats = {
+    totalApplications: applications.length,
+    accepted: applications.filter(a => a.status === 'Accepted').length,
+    rejected: applications.filter(a => a.status === 'Rejected').length,
+    pending: applications.filter(a => a.status === 'Pending').length,
+  };
+
+  const getPercentage = (count) => {
+    if (stats.totalApplications === 0) return 0;
+    return Math.round((count / stats.totalApplications) * 100);
+  };
 
   // Mock data to exactly match the visual style of the reference image
   const barChartData = [
@@ -89,53 +104,61 @@ const CompanyDashboard = () => {
               <div className="bg-white/80 dark:bg-dark-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-dark-700 flex items-center justify-between hover:shadow-md transition-shadow group cursor-default">
                 <div>
                   <p className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Applications</p>
-                  <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">132.0K</h3>
+                  <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                    {stats.totalApplications}
+                  </h3>
                 </div>
                 <div className="w-16 h-16 relative transform group-hover:scale-110 transition-transform duration-300">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData1} innerRadius={22} outerRadius={30} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
-                        {pieData1.map((entry, index) => <Cell key={`cell-${index}`} fill={index === 0 ? '#4c1d95' : 'var(--tw-colors-gray-100)'} className={index === 1 ? 'dark:fill-dark-700' : ''} />)}
+                      <Pie data={[{value: 100}]} innerRadius={22} outerRadius={30} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
+                        <Cell fill="#4c1d95" />
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
-                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300">60%</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-[10px] font-extrabold text-gray-700 dark:text-gray-300 uppercase">Total</span>
                 </div>
               </div>
               
               {/* Card 2 */}
               <div className="bg-white/80 dark:bg-dark-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-dark-700 flex items-center justify-between hover:shadow-md transition-shadow group cursor-default">
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Shortlisted</p>
-                  <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">10.9k</h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Accepted</p>
+                  <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                    {stats.accepted}
+                  </h3>
                 </div>
                 <div className="w-16 h-16 relative transform group-hover:scale-110 transition-transform duration-300">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData2} innerRadius={22} outerRadius={30} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
-                        {pieData2.map((entry, index) => <Cell key={`cell-${index}`} fill={index === 0 ? '#16a34a' : 'var(--tw-colors-gray-100)'} className={index === 1 ? 'dark:fill-dark-700' : ''} />)}
+                       <Pie data={[{value: getPercentage(stats.accepted)}, {value: 100 - getPercentage(stats.accepted)}]} innerRadius={22} outerRadius={30} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
+                        <Cell fill="#16a34a" />
+                        <Cell fill="var(--tw-colors-gray-100)" className="dark:fill-dark-700" />
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
-                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300">50%</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300">{getPercentage(stats.accepted)}%</span>
                 </div>
               </div>
 
               {/* Card 3 */}
               <div className="bg-white/80 dark:bg-dark-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-dark-700 flex items-center justify-between hover:shadow-md transition-shadow group cursor-default">
                 <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">On-Hold</p>
-                  <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">03.1k</h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Rejected</p>
+                  <h3 className="text-3xl font-extrabold text-gray-900 dark:text-white group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors">
+                    {stats.rejected}
+                  </h3>
                 </div>
                 <div className="w-16 h-16 relative transform group-hover:scale-110 transition-transform duration-300">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData3} innerRadius={22} outerRadius={30} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
-                        {pieData3.map((entry, index) => <Cell key={`cell-${index}`} fill={index === 0 ? '#ca8a04' : 'var(--tw-colors-gray-100)'} className={index === 1 ? 'dark:fill-dark-700' : ''} />)}
+                      <Pie data={[{value: getPercentage(stats.rejected)}, {value: 100 - getPercentage(stats.rejected)}]} innerRadius={22} outerRadius={30} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
+                        <Cell fill="#ef4444" />
+                        <Cell fill="var(--tw-colors-gray-100)" className="dark:fill-dark-700" />
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
-                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300">34%</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300">{getPercentage(stats.rejected)}%</span>
                 </div>
               </div>
             </div>
@@ -239,23 +262,30 @@ const CompanyDashboard = () => {
                <div className="bg-white/80 dark:bg-dark-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-dark-700">
                   <h3 className="font-extrabold text-gray-900 dark:text-white text-xl mb-6">New Applications</h3>
                   <div className="space-y-4">
-                    {[
-                      { name: 'Crystal Doe', role: 'UI/UX Designer', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop' },
-                      { name: 'Mason Clark', role: 'Project Coordinator', img: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=150&auto=format&fit=crop' },
-                      { name: 'Emily Yates', role: 'Logical Support', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop' },
-                      { name: 'Daniel Smith', role: 'Database Architect', img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop' },
-                    ].map((applicant, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-dark-700/50 rounded-xl transition-all cursor-pointer group border border-transparent hover:border-gray-200 dark:hover:border-dark-600 hover:shadow-sm">
-                        <div className="flex items-center gap-4">
-                           <img src={applicant.img} alt={applicant.name} className="w-12 h-12 rounded-full border-2 border-white dark:border-dark-600 shadow-sm object-cover" />
-                           <div>
-                             <h4 className="font-bold text-gray-800 dark:text-white text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{applicant.name}</h4>
-                             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">Applied for <span className="font-bold text-gray-600 dark:text-gray-300">{applicant.role}</span></p>
-                           </div>
+                    {applications.length === 0 ? (
+                      <div className="p-12 text-center text-gray-500 font-medium">No new applications for your jobs.</div>
+                    ) : (
+                      applications.slice(0, 5).map((app, idx) => (
+                        <div key={idx} className="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-dark-700/50 rounded-xl transition-all cursor-pointer group border border-transparent hover:border-gray-200 dark:hover:border-dark-600 hover:shadow-sm">
+                          <div className="flex items-center gap-4">
+                             <div className="w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-lg">
+                               {app.firstName.charAt(0)}
+                             </div>
+                             <div>
+                               <h4 className="font-bold text-gray-800 dark:text-white text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">{app.firstName} {app.lastName}</h4>
+                               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">Applied for <span className="font-bold text-gray-600 dark:text-gray-300">{app.jobId?.title || 'Unknown'}</span></p>
+                             </div>
+                          </div>
+                          <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                            app.status === 'Accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' :
+                            app.status === 'Rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400' :
+                            'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400'
+                          }`}>
+                            {app.status}
+                          </span>
                         </div>
-                        <button className="text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 p-2 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-900/20 transition-colors"><MoreHorizontal size={20} /></button>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                </div>
             </div>
